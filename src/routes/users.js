@@ -117,5 +117,51 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Returns JWT token
+ */
+
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user) return res.status(400).json({ error: 'User not found' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid password' });
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role_id: user.role_id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Login failed', detail: err.message });
+  }
+});
+
 module.exports = router;
 
