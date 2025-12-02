@@ -4,6 +4,7 @@ const db = require('../config/db');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 require('dotenv').config();
 
 
@@ -19,7 +20,7 @@ require('dotenv').config();
  *         description: List of users
  */
 
-router.get('/users', async (req, res) => {
+router.get('/users', auth,  async (req, res) => {
     try {
         const result = await db.query(
             `
@@ -61,7 +62,7 @@ router.get('/users', async (req, res) => {
  *       201:
  *         description: User created
  */
-router.post('/users', async (req, res) => {
+router.post('/users',auth, async (req, res) => {
   const { username, email, password, role_id } = req.body;
   try {
     const result = await db.query(

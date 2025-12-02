@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-
-const authenticationToken = (req, res, next) => {
+module.exports = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -17,4 +16,3 @@ const authenticationToken = (req, res, next) => {
 
 };
 
-module.exports = {authenticationToken};
