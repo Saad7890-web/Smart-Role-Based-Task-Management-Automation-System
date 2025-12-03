@@ -72,11 +72,29 @@ const updateTaskStatus = async (req, res) => {
     }
 }
 
+const deleteTask = async (req, res) => {
+      try {
+      const result = await db.query(
+        `UPDATE tasks
+         SET is_active = false, updated_at = NOW()
+         WHERE id = $1
+         RETURNING *`,
+        [req.params.id]
+      );
+
+      res.json({ message: "Task deleted", task: result.rows[0] });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Task deletion failed" });
+    }
+}
+
 
 module.exports = {
     createTask,
     getAllTasksByProjectId,
     getMyTasks,
     updateTaskStatus,
+    deleteTask,
 }
 
