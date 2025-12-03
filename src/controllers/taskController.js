@@ -34,8 +34,49 @@ const getAllTasksByProjectId = async (req, res) => {
     }
 }
 
+const getMyTasks = async(req, res) => {
+    try {
+      const result = await db.query(
+        `SELECT *
+         FROM tasks
+         WHERE assigned_to = $1 AND is_active = true`,
+        [req.user.id]
+      );
+
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to fetch employee tasks" });
+    }
+  
+}
+
+const updateTaskStatus = async (req, res) => {
+     try {
+      const result = await db.query(
+        `UPDATE tasks 
+         SET status = $1, updated_at = NOW()
+         WHERE id = $2 AND assigned_to = $3
+         RETURNING *`,
+        [status, req.params.id, req.user.id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "Task not found or not yours" });
+      }
+
+      res.json({ message: "Task updated", task: result.rows[0] });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to update task status" });
+    }
+}
+
+
 module.exports = {
     createTask,
     getAllTasksByProjectId,
+    getMyTasks,
+    updateTaskStatus,
 }
 
