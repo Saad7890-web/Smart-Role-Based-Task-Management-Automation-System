@@ -6,6 +6,8 @@ const setupSwagger = require('./config/swagger');
 const userRoutes = require('./routes/usersRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const projectAssignmentsRoutes = require('./routes/projectAssignmentsRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+
 const app = express();
 app.use(express.json());
 
@@ -14,6 +16,7 @@ app.use('/', exampleRoutes);
 app.use('/', userRoutes);
 app.use('/projects', projectRoutes);
 app.use('/assignments', projectAssignmentsRoutes);
+app.use('/tasks', taskRoutes);
 
 
 
