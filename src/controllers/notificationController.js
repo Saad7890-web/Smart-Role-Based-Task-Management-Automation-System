@@ -17,6 +17,29 @@ const getAllNotifications = async (req, res) => {
 }
 
 
+const updateNotificationStatus = async (req, res) => {
+    try {
+        const result = await db.query(
+            `UPDATE notifications
+            SET is_read = true
+            WHERE id = $1 AND user_id = $2
+            RETURNING *`,
+            [req.params.id, req.user.id]
+        );
+
+        if(result.rows.length === 0){
+            return res.status(404).json({message:"Not found"});
+        }
+        res.json({message: "marked as read", notification: res.result.rows[0]});
+    }
+    catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update notification" });
+  }
+}
+
+
 module.exports = {
     getAllNotifications,
+    updateNotificationStatus,
 }
