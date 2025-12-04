@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const notifyUser = require("../utils/notify")
 
 const assignProject = async (req, res) => {
   const { project_id, user_id } = req.body;
@@ -11,6 +12,7 @@ const assignProject = async (req, res) => {
       [project_id, user_id, req.user.id]
     );
     res.status(201).json({ assignment: result.rows[0] });
+    await notifyUser(user_id, "Assigned to Project", `You have been assigned to project ${project_id}`);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Assignment failed" });

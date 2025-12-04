@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const notifyUser = require("../utils/notify");
 
 const createTask = async (req, res) => {
     const {project_id, assigned_to, title, description, prioriy, deadline} = req.body;
@@ -11,6 +12,7 @@ const createTask = async (req, res) => {
             [project_id, assigned_to,  req.user.id, title, description, prioriy, deadline]
         )
         req.status(201).json({task: result.rows[0]});
+        await notifyUser(assigned_to, "New Task Assigned", `You Have Been Assigned a new task ${title}`)
     } catch (err) {
         console.error(err);
         res.status(500).json({message: "Task creation failed"});
@@ -66,6 +68,7 @@ const updateTaskStatus = async (req, res) => {
       }
 
       res.json({ message: "Task updated", task: result.rows[0] });
+      await notifyUser(req.user.id, "Task Status Updated", `Your task status is now: ${status}`)
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Failed to update task status" });
