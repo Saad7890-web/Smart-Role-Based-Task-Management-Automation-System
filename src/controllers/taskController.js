@@ -11,8 +11,10 @@ const createTask = async (req, res) => {
              RETURNING *`,
             [project_id, assigned_to,  req.user.id, title, description, prioriy, deadline]
         )
-        req.status(201).json({task: result.rows[0]});
+
         await notifyUser(assigned_to, "New Task Assigned", `You Have Been Assigned a new task ${title}`)
+        res.status(201).json({task: result.rows[0]});
+        
     } catch (err) {
         console.error(err);
         res.status(500).json({message: "Task creation failed"});
@@ -66,9 +68,9 @@ const updateTaskStatus = async (req, res) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ message: "Task not found or not yours" });
       }
-
-      res.json({ message: "Task updated", task: result.rows[0] });
       await notifyUser(req.user.id, "Task Status Updated", `Your task status is now: ${status}`)
+      res.json({ message: "Task updated", task: result.rows[0] });
+     
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Failed to update task status" });

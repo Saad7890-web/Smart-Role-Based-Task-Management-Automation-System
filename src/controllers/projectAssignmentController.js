@@ -11,8 +11,9 @@ const assignProject = async (req, res) => {
             RETURNING *`,
       [project_id, user_id, req.user.id]
     );
-    res.status(201).json({ assignment: result.rows[0] });
     await notifyUser(user_id, "Assigned to Project", `You have been assigned to project ${project_id}`);
+    res.status(201).json({ assignment: result.rows[0] });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Assignment failed" });
