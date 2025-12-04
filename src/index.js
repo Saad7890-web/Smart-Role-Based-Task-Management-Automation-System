@@ -7,6 +7,7 @@ const userRoutes = require('./routes/usersRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const projectAssignmentsRoutes = require('./routes/projectAssignmentsRoutes');
 const taskRoutes = require('./routes/taskRoutes');
+const notificationRoutes = require('./routes/notificationsRoutes')
 
 const app = express();
 app.use(express.json());
@@ -17,7 +18,7 @@ app.use('/', userRoutes);
 app.use('/projects', projectRoutes);
 app.use('/assignments', projectAssignmentsRoutes);
 app.use('/tasks', taskRoutes);
-
+app.use('/notifications', notificationRoutes);
 
 
 setupSwagger(app); 
