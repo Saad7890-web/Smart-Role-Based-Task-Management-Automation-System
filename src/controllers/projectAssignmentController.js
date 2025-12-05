@@ -1,5 +1,7 @@
 const db = require("../config/db");
-const notifyUser = require("../utils/notify")
+const notifyUser = require("../utils/notify");
+const logActivity = require("../utils/activityLog");
+
 
 const assignProject = async (req, res) => {
   const { project_id, user_id } = req.body;
@@ -12,6 +14,7 @@ const assignProject = async (req, res) => {
       [project_id, user_id, req.user.id]
     );
     await notifyUser(user_id, "Assigned to Project", `You have been assigned to project ${project_id}`);
+    await logActivity(req.user.id, "PROJECT_ASSIGN", `Assigned user ${user_id} to project ${project_id}`);
     res.status(201).json({ assignment: result.rows[0] });
     
   } catch (err) {

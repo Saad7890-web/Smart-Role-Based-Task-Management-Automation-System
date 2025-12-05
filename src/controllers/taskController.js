@@ -1,5 +1,7 @@
 const db = require("../config/db");
 const notifyUser = require("../utils/notify");
+const logActivity = require("../utils/activityLog");
+
 
 const createTask = async (req, res) => {
     const {project_id, assigned_to, title, description, prioriy, deadline} = req.body;
@@ -12,7 +14,8 @@ const createTask = async (req, res) => {
             [project_id, assigned_to,  req.user.id, title, description, prioriy, deadline]
         )
 
-        await notifyUser(assigned_to, "New Task Assigned", `You Have Been Assigned a new task ${title}`)
+        await notifyUser(assigned_to, "New Task Assigned", `You Have Been Assigned a new task ${title}`);
+        await logActivity(req.user.id, "TASK_CREATED", `Task created: ${title}`);
         res.status(201).json({task: result.rows[0]});
         
     } catch (err) {
@@ -68,7 +71,9 @@ const updateTaskStatus = async (req, res) => {
       if (result.rows.length === 0) {
         return res.status(404).json({ message: "Task not found or not yours" });
       }
-      await notifyUser(req.user.id, "Task Status Updated", `Your task status is now: ${status}`)
+      await notifyUser(req.user.id, "Task Status Updated", `Your task status is now: ${status}`);
+      await logActivity(req.user.id, "TASK_STATUS", `Task ID ${id} status changed to ${status}`);
+
       res.json({ message: "Task updated", task: result.rows[0] });
      
     } catch (err) {
@@ -86,6 +91,7 @@ const deleteTask = async (req, res) => {
          RETURNING *`,
         [req.params.id]
       );
+      await logActivity(req.user.id, "TASK_DELETED", `Task ID ${id} deleted`);
 
       res.json({ message: "Task deleted", task: result.rows[0] });
     } catch (err) {

@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const logActivity = require("../utils/activityLog");
 
 const createProject = async (req, res) => {
   const { name, description, deadline } = req.body;
@@ -10,7 +11,7 @@ const createProject = async (req, res) => {
          RETURNING *`,
       [name, description, deadline, req.user.id]
     );
-
+    await logActivity(req.user.id, "Project_created", `Project Created: ${name}`);
     res.status(201).json({ project: result.rows[0] });
   } catch (err) {
     console.error(err);
